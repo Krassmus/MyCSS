@@ -8,6 +8,7 @@ class InitPlugin extends Migration
             CREATE TABLE `mycss_stylesheets` (
                 `stylesheet_id` char(32) NOT NULL DEFAULT '',
                 `title` varchar(64) NOT NULL DEFAULT '',
+                `description` text DEFAULT NULL,
                 `range_id` char(32) NOT NULL DEFAULT '',
                 `range_type` enum('user','global','institute','course') DEFAULT NULL,
                 `active` tinyint(1) DEFAULT NULL,

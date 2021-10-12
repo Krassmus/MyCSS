@@ -7,6 +7,11 @@
         <input type="text" name="data[title]" value="<?= htmlReady($stylesheet['title']) ?>" required>
     </label>
 
+    <label>
+        <?= _('Beschreibung') ?>
+        <textarea name="data[description]"><?= htmlReady($stylesheet['description']) ?></textarea>
+    </label>
+
     <input type="hidden" name="data[active]" value="0">
     <label>
         <input type="checkbox" name="data[active]" value="1"<?= $stylesheet['active'] || $stylesheet->isNew() ? ' checked' : '' ?>>
