@@ -9,7 +9,7 @@ STUDIP.dialogReady(function () {
     mode = element.data().mode || 'less';
     editor = CodeMirror.fromTextArea(element[0], {
         mode: mode,
-        theme: 'default',
+        theme: 'elegant',
         lineNumbers: true,
         styleActiveLine: true,
         matchBrackets: true,
