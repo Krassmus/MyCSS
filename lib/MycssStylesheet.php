@@ -36,26 +36,17 @@ class MycssStylesheet extends SimpleORMap
 
         $css = $cache->read($cache_index);
         if ($css === false) {
-            $scss = '';
-            $mixinFile = $GLOBALS['STUDIP_BASE_PATH'] . '/resources/assets/stylesheets/mixins.scss';
-            foreach (file($mixinFile) as $mixin) {
-                if (!preg_match('/@import "(.*)";/', $mixin, $match)) {
-                    continue;
-                }
-                $scss .= file_get_contents($GLOBALS['STUDIP_BASE_PATH'] . '/resources/assets/stylesheets/' . $match[1].".scss") . "\n";
-            }
-            $scss .= sprintf('$image-path: "%s";', Assets::url('images')) . "\n";
-            $scss .= '$icon-path: "${image-path}/icons/16";' . "\n";
-
-            $scss .= '.mycss_'.$this->getId().' { '.$this['css'].' }';
-            $compiler = new \ScssPhp\ScssPhp\Compiler();
             try {
-                $css = $compiler->compile($scss);
+                $css = Assets\SASSCompiler::getInstance()->compile(sprintf(
+                        '.mycss_%s { %s }',
+                        $this->getId(),
+                        $this->css
+                    ));
                 $cache->write($cache_index, $css);
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 PageLayout::postError(_('MyCSS-Fehler: ').$e->getMessage());
             }
-
+            $scss = '';
 
         }
         return $css;
