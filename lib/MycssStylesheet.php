@@ -47,12 +47,12 @@ class MycssStylesheet extends SimpleORMap
             $scss .= sprintf('$image-path: "%s";', Assets::url('images')) . "\n";
             $scss .= '$icon-path: "${image-path}/icons/16";' . "\n";
 
-            $scss = '.mycss_'.$this->getId().' { '.$this['css'].' }';
+            $scss .= '.mycss_'.$this->getId().' { '.$this['css'].' }';
             $compiler = new \ScssPhp\ScssPhp\Compiler();
             try {
                 $css = $compiler->compile($scss);
                 $cache->write($cache_index, $css);
-            } catch(ScssPhp\ScssPhp\Exception\ParserException $e) {
+            } catch(Exception $e) {
                 PageLayout::postError(_('MyCSS-Fehler: ').$e->getMessage());
             }
 

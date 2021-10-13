@@ -47,9 +47,11 @@ $actions->addLink(
     Icon::create('add', Icon::ROLE_CLICKABLE),
     ['data-dialog' => 1]
 );
-$actions->addLink(
-    _('Marktplatz besuchen'),
-    PluginEngine::getURL($plugin, [], 'market/index'),
-    Icon::create('add', Icon::ROLE_CLICKABLE)
-);
+if (MycssStylesheet::countBySql("`public` = '1' ") > 0) {
+    $actions->addLink(
+        _('Marktplatz besuchen'),
+        PluginEngine::getURL($plugin, [], 'market/index'),
+        Icon::create('billboard', Icon::ROLE_CLICKABLE)
+    );
+}
 Sidebar::Get()->addWidget($actions);
