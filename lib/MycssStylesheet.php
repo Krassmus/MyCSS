@@ -18,6 +18,10 @@ class MycssStylesheet extends SimpleORMap
     protected static function configure($config = array())
     {
         $config['db_table'] = 'mycss_stylesheets';
+        $config['belongs_to']['origin'] = [
+            'class_name'  => 'MycssStylesheet',
+            'foreign_key' => 'origin_id'
+        ];
         parent::configure($config);
     }
 

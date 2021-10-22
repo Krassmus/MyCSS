@@ -20,6 +20,14 @@
                         <? endif ?>
                     </td>
                     <td class="actions">
+                        <? if ($stylesheet['origin_id'] && $stylesheet->origin && $stylesheet->origin['public'] && ($stylesheet->origin['chdate'] > $stylesheet['updatetime'])) : ?>
+                            <a href="<?= PluginEngine::getLink($plugin, [], 'market/update/'.$stylesheet->getId()) ?>"
+                               data-dialog="size=auto"
+                               title="<?= _('Zu diesem Design gibt es Updates. Sollen diese installiert werden?') ?>"
+                               data-confirm="<?= _('Wirklich dieses Design aktualisieren?')." ".($stylesheet['chdate'] > $stylesheet['updatetime'] ? sprintf(_('Das wird Ihre Änderungen von %s Uhr überschreiben.'), date('d.m.Y H:i', $stylesheet['chdate'])) : '') ?>">
+                                <?= Icon::create('refresh', Icon::ROLE_CLICKABLE)->asImg(20, ['class' => "text-bottom"]) ?>
+                            </a>
+                        <? endif ?>
                         <a href="<?= PluginEngine::getLink($plugin, [], 'styles/edit/'.$stylesheet->getId()) ?>" data-dialog="size=large">
                             <?= Icon::create('edit', Icon::ROLE_CLICKABLE)->asImg(20, ['class' => "text-bottom"]) ?>
                         </a>
@@ -64,3 +72,11 @@
 
     </fieldset>
 </form>
+
+<? if (Request::get("reload")) : ?>
+<script>
+    window.setTimeout(function () {
+        window.location.reload(false);
+    }, 1500);
+</script>
+<? endif ?>

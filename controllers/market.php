@@ -23,8 +23,24 @@ class MarketController extends PluginController
         $stylesheet['range_type'] = 'user';
         $stylesheet['range_id'] = User::findCurrent()->id;
         $stylesheet['title'] = $stylesheet['title']._(" (Kopie)");
+        $stylesheet['origin_id'] = $this->stylesheet->getId();
+        $stylesheet['updatetime'] = time();
         $stylesheet->store();
         PageLayout::postSuccess(_('Design wurde kopiert.'));
         $this->redirect('styles/index');
+    }
+
+    public function update_action($stylesheet_id)
+    {
+        $this->stylesheet = MycssStylesheet::find($stylesheet_id);
+        if (!$this->stylesheet->isEditable() || !$this->stylesheet->origin['public']) {
+            throw new AccessDeniedException();
+        }
+
+        $this->stylesheet['css'] = $this->stylesheet->origin['css'];
+        $this->stylesheet['updatetime'] = time();
+        $this->stylesheet->store();
+        PageLayout::postSuccess(_('Design wurde aktualisiert.'));
+        $this->redirect(PluginEngine::getURL($this->plugin, ['reload' => 'ohyes'], 'theswitcher/index'));
     }
 }
