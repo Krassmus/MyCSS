@@ -2,8 +2,23 @@
 
 class MycssStylesheet extends SimpleORMap
 {
+    protected static function configure($config = array())
+    {
+        $config['db_table'] = 'mycss_stylesheets';
+        $config['belongs_to']['origin'] = [
+            'class_name'  => self::class,
+            'foreign_key' => 'origin_id'
+        ];
 
-    static public function findMyActiveOnes()
+        $config['registered_callbacks']['after_store'][] = function (MycssStylesheet $stylesheet) {
+            $cache_index = "mycss_{$stylesheet->id}";
+            StudipCacheFactory::getCache()->expire($cache_index);
+        };
+
+        parent::configure($config);
+    }
+
+    public static function findMyActiveOnes()
     {
         $stylesheets = [];
         foreach (static::findBySQL("`range_type` = 'global' AND `active` = '1'") as $style) {
@@ -15,28 +30,17 @@ class MycssStylesheet extends SimpleORMap
         return $stylesheets;
     }
 
-    protected static function configure($config = array())
-    {
-        $config['db_table'] = 'mycss_stylesheets';
-        $config['belongs_to']['origin'] = [
-            'class_name'  => 'MycssStylesheet',
-            'foreign_key' => 'origin_id'
-        ];
-        parent::configure($config);
-    }
-
     public function isEditable()
     {
-        if ($GLOBALS['perm']->have_perm("root") || $this->isNew() || ($this['range_id'] === User::findCurrent()->id)) {
-            return true;
-        }
-        return false;
+        return $GLOBALS['perm']->have_perm('root')
+            || $this->isNew()
+            || $this['range_id'] === User::findCurrent()->id;
     }
 
     public function compile()
     {
         $cache       = StudipCacheFactory::getCache();
-        $cache_index = sprintf('mycss_%s', $this->getId());
+        $cache_index = "mycss_{$this->id}";
 
         $css = $cache->read($cache_index);
         if ($css === false) {
@@ -48,11 +52,10 @@ class MycssStylesheet extends SimpleORMap
                     ));
                 $cache->write($cache_index, $css);
             } catch (Exception $e) {
-                PageLayout::postError(_('MyCSS-Fehler: ').$e->getMessage());
+                PageLayout::postError(_('MyCSS-Fehler: ') . $e->getMessage());
             }
-            $scss = '';
-
         }
+
         return $css;
     }
 
