@@ -6,6 +6,12 @@ class MyCSS extends StudIPPlugin implements SystemPlugin
 {
 
     public $editor_loaded = false;
+    private $mycss = [
+        'stylesheets' => [],
+        'editor'      => [
+            'assets' => [],
+        ],
+    ];
 
     public function __construct()
     {
@@ -17,18 +23,11 @@ class MyCSS extends StudIPPlugin implements SystemPlugin
         }
 
         $stylesheets = MycssStylesheet::findMyActiveOnes();
-        $stylesheet_ids = [];
         foreach ($stylesheets as $stylesheet) {
             if ($stylesheet['active']) {
-                $stylesheet_ids[] = 'mycss_' . $stylesheet->getId();
+                $this->mycss['stylesheets'][] = 'mycss_' . $stylesheet->getId();
             }
         }
-        PageLayout::addHeadElement(
-            'script',
-            [],
-            'window.STUDIP.MyCSS = {"stylesheets": '.json_encode($stylesheet_ids).'};'
-        );
-        PageLayout::addScript($this->getPluginURL()."/assets/startup.js");
         foreach ($stylesheets as $stylesheet) {
             PageLayout::addHeadElement(
                 'style',
@@ -38,22 +37,28 @@ class MyCSS extends StudIPPlugin implements SystemPlugin
         }
 
         if ($GLOBALS['perm']->have_perm(Config::get()->MYCSS_EDIT_PERM) && count($stylesheets)) {
-            PageLayout::addScript($this->getPluginURL()."/assets/theswitcher.js");
+            NotificationCenter::on('PageWillRender', function () {
+                PageLayout::addHeadElement(
+                    'script',
+                    [],
+                    'window.STUDIP.MyCSS = '.json_encode($this->mycss).';'
+                );
+                $this->addScript('assets/startup.js');
+            });
+            $this->addScript('assets/theswitcher.js');
 
-            PageLayout::addStylesheet($this->getPluginURL(). '/assets/codemirror/codemirror.css');
-            PageLayout::addScript($this->getPluginURL(). '/assets/codemirror/codemirror.js');
-            PageLayout::addScript($this->getPluginURL(). '/assets/codemirror/active-line.js');
-            PageLayout::addScript($this->getPluginURL(). '/assets/codemirror/match-brackets.js');
-            PageLayout::addScript($this->getPluginURL(). '/assets/codemirror/css.js');
-            PageLayout::addScript($this->getPluginURL(). '/assets/codemirror/less.js');
-            PageLayout::addScript($this->getPluginURL(). '/assets/codemirror/xml.js');
-            PageLayout::addScript($this->getPluginURL(). '/assets/codemirror/htmlmixed.js');
-            foreach (glob($this->getPluginPath() . '/assets/codemirror/theme/*.css') as $theme) {
-                $theme = str_replace($this->getPluginPath(), '', $theme);
-                PageLayout::addStylesheet($this->getPluginURL() . $theme);
-            }
-            PageLayout::addScript($this->getPluginURL()."/assets/editor.js");
-            $this->editor_loaded = true;
+            $this->loadEditor();
         }
+    }
+
+    public function loadEditor()
+    {
+        if ($this->editor_loaded) {
+            return;
+        }
+        $this->mycss['editor']['assets'][] = $this->getPluginURL(). '/assets/ace/ace.js';
+        $this->mycss['editor']['assets'][] = $this->getPluginURL(). '/assets/mycss-editor.css';
+        $this->addScript('assets/editor.js');
+        $this->editor_loaded = true;
     }
 }

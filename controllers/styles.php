@@ -15,21 +15,9 @@ class StylesController extends PluginController
     {
         Navigation::activateItem('/profile/settings/mycss');
         if (!$this->plugin->editor_loaded) {
-            PageLayout::addStylesheet($this->plugin->getPluginURL() . '/assets/codemirror/codemirror.css');
-            PageLayout::addScript($this->plugin->getPluginURL() . '/assets/codemirror/codemirror.js');
-            PageLayout::addScript($this->plugin->getPluginURL() . '/assets/codemirror/active-line.js');
-            PageLayout::addScript($this->plugin->getPluginURL() . '/assets/codemirror/match-brackets.js');
-            PageLayout::addScript($this->plugin->getPluginURL() . '/assets/codemirror/css.js');
-            PageLayout::addScript($this->plugin->getPluginURL() . '/assets/codemirror/less.js');
-            PageLayout::addScript($this->plugin->getPluginURL() . '/assets/codemirror/xml.js');
-            PageLayout::addScript($this->plugin->getPluginURL() . '/assets/codemirror/htmlmixed.js');
-
-            foreach (glob($this->plugin->getPluginPath() . '/assets/codemirror/theme/*.css') as $theme) {
-                $theme = str_replace($this->plugin->getPluginPath(), '', $theme);
-                PageLayout::addStylesheet($this->plugin->getPluginURL() . $theme);
-            }
-
+            PageLayout::addScript($this->plugin->getPluginURL() . "/assets/ace/ace.js");
             PageLayout::addScript($this->plugin->getPluginURL() . "/assets/editor.js");
+            PageLayout::addStylesheet($this->getPluginURL(). '/assets/mycss-editor.css');
         }
         $this->stylesheets = [];
         if ($GLOBALS['perm']->have_perm("root")) {
@@ -46,6 +34,21 @@ class StylesController extends PluginController
         if (!$this->stylesheet->isEditable()) {
             throw new AccessDeniedException();
         }
+        PageLayout::addScript($this->plugin->getPluginURL() . "/assets/ace/ace.js");
+        PageLayout::addScript($this->plugin->getPluginURL() . "/assets/editor.js");
+        PageLayout::addStylesheet($this->plugin->getPluginURL(). '/assets/mycss-editor.css');
+        PageLayout::addHeadElement('script', [], "
+        $(function () {
+            let editor = ace.edit('mycss-editor');
+            $('#mycss-textarea').hide();
+            editor.getSession().setValue($('#mycss-textarea').val());
+            editor.getSession().on('change', function(){
+                $('#mycss-textarea').val(editor.getSession().getValue());
+            });
+            editor.setTheme('ace/theme/xcode');
+            editor.session.setMode('ace/mode/scss');
+        });
+        ");
         PageLayout::setTitle(_('Design bearbeiten'));
         if (Request::isPost()) {
             if (Request::submitted('delete')) {

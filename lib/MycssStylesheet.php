@@ -42,10 +42,10 @@ class MycssStylesheet extends SimpleORMap
         if ($css === false) {
             try {
                 $css = Assets\SASSCompiler::getInstance()->compile(sprintf(
-                        '.mycss_%s { %s }',
-                        $this->getId(),
-                        $this->css
-                    ));
+                    '.mycss_%s { %s }',
+                    $this->getId(),
+                    $this->css
+                ));
                 $cache->write($cache_index, $css);
             } catch (Exception $e) {
                 PageLayout::postError(_('MyCSS-Fehler: ').$e->getMessage());

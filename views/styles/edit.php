@@ -38,7 +38,8 @@
 
     <label>
         <?= _('SCSS-Angaben') ?>
-        <textarea id="mycss-editor" name="data[css]"><?= htmlReady($stylesheet['css']) ?></textarea>
+        <textarea id="mycss-textarea" name="data[css]"><?= htmlReady($stylesheet['css']) ?></textarea>
+        <div id="mycss-editor"></div>
     </label>
 
     <input type="hidden" id="mycss_redirect_url" name="mycss_redirect_url" value="">
