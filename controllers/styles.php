@@ -17,7 +17,7 @@ class StylesController extends PluginController
         if (!$this->plugin->editor_loaded) {
             PageLayout::addScript($this->plugin->getPluginURL() . "/assets/ace/ace.js");
             PageLayout::addScript($this->plugin->getPluginURL() . "/assets/editor.js");
-            PageLayout::addStylesheet($this->getPluginURL(). '/assets/mycss-editor.css');
+            PageLayout::addStylesheet($this->plugin->getPluginURL(). '/assets/mycss-editor.css');
         }
         $this->stylesheets = [];
         if ($GLOBALS['perm']->have_perm("root")) {
