@@ -22,32 +22,34 @@ class MyCSS extends StudIPPlugin implements SystemPlugin
             Navigation::addItem('/profile/settings/mycss', $nav);
         }
 
-        $stylesheets = MycssStylesheet::findMyActiveOnes();
-        foreach ($stylesheets as $stylesheet) {
-            if ($stylesheet['active']) {
-                $this->mycss['stylesheets'][] = 'mycss_' . $stylesheet->getId();
+        if (!Request::isAjax()) {
+            $stylesheets = MycssStylesheet::findMyActiveOnes();
+            foreach ($stylesheets as $stylesheet) {
+                if ($stylesheet['active']) {
+                    $this->mycss['stylesheets'][] = 'mycss_' . $stylesheet->getId();
+                }
             }
-        }
-        foreach ($stylesheets as $stylesheet) {
-            PageLayout::addHeadElement(
-                'style',
-                [],
-                $stylesheet->compile()
-            );
-        }
-
-        if ($GLOBALS['perm']->have_perm(Config::get()->MYCSS_EDIT_PERM) && count($stylesheets)) {
-            NotificationCenter::on('PageWillRender', function () {
+            foreach ($stylesheets as $stylesheet) {
                 PageLayout::addHeadElement(
-                    'script',
+                    'style',
                     [],
-                    'window.STUDIP.MyCSS = '.json_encode($this->mycss).';'
+                    $stylesheet->compile()
                 );
-                $this->addScript('assets/startup.js');
-            });
-            $this->addScript('assets/theswitcher.js');
+            }
 
-            $this->loadEditor();
+            if ($GLOBALS['perm']->have_perm(Config::get()->MYCSS_EDIT_PERM) && count($stylesheets)) {
+                NotificationCenter::on('PageWillRender', function () {
+                    PageLayout::addHeadElement(
+                        'script',
+                        [],
+                        'window.STUDIP.MyCSS = ' . json_encode($this->mycss) . ';'
+                    );
+                    $this->addScript('assets/startup.js');
+                });
+                $this->addScript('assets/theswitcher.js');
+
+                $this->loadEditor();
+            }
         }
     }
 
